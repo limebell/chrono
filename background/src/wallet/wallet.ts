@@ -20,6 +20,7 @@ import * as ethers from "ethers";
 import { Address } from "@planetarium/account";
 import { AwsKmsAccount, KMSClient } from "@planetarium/account-aws-kms";
 import {
+	FungibleAssetValue,
 	UnsignedTx,
 	encodeSignedTx,
 	encodeUnsignedTx,
@@ -60,6 +61,7 @@ export default class Wallet {
 	private readonly emitter: Emitter;
 	private readonly origin: string | undefined;
 	private readonly canCall: string[];
+	private readonly maxGasPrice: FungibleAssetValue;
 
 	/**
 	 *
@@ -100,6 +102,7 @@ export default class Wallet {
 			"isConnected",
 			"checkKMSAccount",
 		];
+		this.maxGasPrice = fav(MEAD, 0.00001);
 	}
 
 	static async createInstance(
@@ -194,7 +197,7 @@ export default class Wallet {
 			genesisHash,
 			publicKey: (await signer.getPublicKey()).toBytes("uncompressed"),
 			timestamp: new Date(),
-			maxGasPrice: fav(MEAD, 1),
+			maxGasPrice: this.maxGasPrice,
 			gasLimit: 4n,
 		};
 
@@ -267,7 +270,7 @@ export default class Wallet {
 					genesisHash,
 					publicKey: (await signer.getPublicKey()).toBytes("uncompressed"),
 					timestamp: new Date(),
-					maxGasPrice: fav(MEAD, 1),
+					maxGasPrice: this.maxGasPrice,
 					gasLimit,
 				};
 
